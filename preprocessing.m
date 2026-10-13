@@ -93,8 +93,8 @@ for device_idx = 1:11
                 segment_norm = segment_cfo_corrected / rms_val;
 
                 
-                segment_real = real(segment_norm);
-                [cA1, cD1] = dwt(segment_real, wavelet_type);
+                % Preserve the full complex IQ waveform as specified in Section 4.2.
+                [cA1, cD1] = dwt(segment_norm, wavelet_type);
                 [cA2, cD2] = dwt(cA1, wavelet_type);
 
                 title_base = sprintf('Device%d IQ%d Window%d -', device_idx, i, w);
@@ -173,7 +173,7 @@ function sig_out = augmentation_alt(sig_in)
 
     
     gain = 1 + 0.05 * randn();                 
-    sig_nl = gain * sig_noise + 0.003 * (sig_noise.^3);  
+    sig_nl = gain * sig_noise + 0.003 * sig_noise .* abs(sig_noise).^2;  
 
     
     alpha = 1 + 0.02 * randn();                 
@@ -242,7 +242,7 @@ end
 
 function save_stft_spectrogram(signal, win_size, overlap, nfft, fs, save_path, title_text)
     [S, F, T] = spectrogram(signal, win_size, overlap, nfft, fs, 'yaxis');
-    P = 10 * log10(abs(S));
+    P = 10 * log10(max(abs(S).^2, eps));  % log-power STFT: 10 log10(|S|^2)
     fig = figure('Visible', 'off', 'Position', [100, 100, 560, 420]);
     imagesc(T, F, P);
     axis xy;
