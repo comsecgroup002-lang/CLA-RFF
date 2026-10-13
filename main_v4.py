@@ -46,9 +46,9 @@ MODEL_WEIGHTS  = "convnext_cosface.pth"
 BACKBONE        = "convnext_tiny"     # convnext_tiny/small/base
 IMG_SIZE        = 224
 BATCH_SIZE      = 128
-MAX_EPOCHS      = 60
+MAX_EPOCHS      = 50
 WARMUP_EPOCHS   = 3
-BASE_LR         = 3e-4
+BASE_LR         = 1e-3
 MIN_LR          = 1e-5
 WEIGHT_DECAY    = 0.05
 EARLY_PATIENCE  = 8
@@ -67,7 +67,7 @@ ALPHA_GRID        = [i/10 for i in range(0, 11)]
 
 CALIB_ACCEPT_P    = 0.90                 
 MARGIN_Q          = 0.20                 
-RHO               = 0.10                 
+RHO               = 0.00                 # Zero threshold offset: matches the manuscript gate rule                 
 
 K_CENTROIDS       = 3                   
 SPEC_TMASK_P      = 0.3                  
@@ -222,7 +222,7 @@ class ConvNeXtCosFace(nn.Module):
         return logits
 
 
-def cosine_lr(optimizer, epoch, base_lr=3e-4, min_lr=1e-5, warmup=3, max_epochs=60):
+def cosine_lr(optimizer, epoch, base_lr=1e-3, min_lr=1e-5, warmup=3, max_epochs=50):
     if epoch < warmup:
         lr = base_lr * float(epoch+1)/float(max(1, warmup))
     else:
